@@ -18,6 +18,82 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Campo de relacionamento com a tabela BankAccount/Category/transaction
+  bankAccount  BankAccount[]
+  categories   Category[]
+  transactions Transaction[]
+
   // adicionando nome na tabela
   @@map("users")
+}
+
+enum BankAccountType {
+  CHECKING
+  INVESTMENT
+  CASH
+
+  @@map("bank_account_type")
+}
+
+model BankAccount {
+  id             String          @id @default(uuid()) @db.Uuid
+  userId         String          @map("user_id") @db.Uuid
+  name           String
+  initialBalance Float           @map("initial_balance")
+  type           BankAccountType
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  transactions   Transaction[]
+
+  // Criando relacionamento com a tabela User/Transaction
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // adicionando nome na tabela
+  @@map("bank_accounts")
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+
+  @@map("transaction_type")
+}
+
+model Category {
+  id           String          @id @default(uuid()) @db.Uuid
+  userId       String          @map("user_id") @db.Uuid
+  name         String
+  icon         String
+  type         TransactionType
+  transactions Transaction[]
+
+  // Criando relacionamento com a tabela User/Transaction
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("categories")
+}
+
+model Transaction {
+  id            String          @id @default(uuid()) @db.Uuid
+  userId        String          @map("user_id") @db.Uuid
+  bankAccountId String          @map("bank_account_id") @db.Uuid
+  categoryId    String?         @map("category_id") @db.Uuid
+  name          String
+  value         Float
+  date          DateTime
+  type          TransactionType
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  // Criando relacionamento com a tabela User
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Criando relacionamento com a tabela BankAccount
+  bankAccount BankAccount @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
+
+  // Criando relacionamento opcional com a tabela Category
+  // Quando deletar uma categoria, o campo category_id da tabela transaction será setado como null
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@map("transactions")
 }
