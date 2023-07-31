@@ -1,18 +1,12 @@
 import { IsNotEmpty, IsString, IsEmail, MinLength } from 'class-validator';
 
-export class CreateUserDto {
-  @IsString()
-  @IsNotEmpty()
-  name: string;
-
+export class SigninDto {
   @IsString()
   @IsNotEmpty()
   @IsEmail()
   email: string;
 
-  @IsString({
-    message: 'A senha precisa ser uma string.',
-  })
+  @IsString()
   @IsNotEmpty()
   @MinLength(8)
   password: string;
