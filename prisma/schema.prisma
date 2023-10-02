@@ -41,6 +41,7 @@ model BankAccount {
   name           String
   initialBalance Float           @map("initial_balance")
   type           BankAccountType
+  color          String
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   transactions   Transaction[]
